@@ -1,0 +1,152 @@
+---
+- name: Configure WSL with my favorite tools and configurations
+  hosts: localhost
+  become: yes
+
+  vars:
+    username: "{{ lookup('env', 'USER') }}"
+
+  tasks:
+    - name: Update and upgrade apt packages
+      apt:
+        update_cache: "yes"
+        upgrade: "yes"
+
+    - name: Install essential packages
+      apt:
+        name:
+          - build-essential
+          - curl
+          - git
+          - vim
+          - htop
+          - zsh
+          - unzip
+          - fontconfig
+          - exa
+          - xsel
+        state: present
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Change default shell to zsh
+      user:
+        name: "{{ username }}"
+        shell: /usr/bin/zsh
+
+    - name: Install Oh My Zsh
+      git:
+        repo: https://github.com/ohmyzsh/ohmyzsh.git
+        dest: /home/{{ username }}/.oh-my-zsh
+        version: master
+      become: no
+      environment:
+        HOME: "/home/{{ username }}"
+        ZSH: "/home/{{ username }}/.oh-my-zsh"
+
+    - name: Install zsh-autosuggestions plugin
+      git:
+        repo: https://github.com/zsh-users/zsh-autosuggestions
+        dest: /home/{{ username }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+      become: no
+
+    - name: Install zsh-syntax-highlighting plugin
+      git:
+        repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+        dest: /home/{{ username }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+      become: no
+
+    - name: Install you-should-use plugin
+      git:
+        repo: https://github.com/MichaelAquilina/zsh-you-should-use.git
+        dest: /home/{{ username }}/.oh-my-zsh/custom/plugins/you-should-use
+      become: no
+
+    - name: Install zsh-bat plugin
+      git:
+        repo: https://github.com/fdellwing/zsh-bat.git
+        dest: /home/{{ username }}/.oh-my-zsh/custom/plugins/zsh-bat
+      become: no
+
+    - name: Install Starship prompt
+      block:
+        - name: Download Starship script
+          get_url:
+            url: https://starship.rs/install.sh
+            dest: /tmp/install_starship.sh
+            mode: '0755'
+          become: no
+          environment:
+            HOME: "/home/{{ username }}"
+        - name: Run Starship script
+          shell: sh /tmp/install_starship.sh --yes
+          become: no
+
+    - name: Install Powerline fonts
+      block:
+        - name: Create Powerline fonts temporary directory
+          file:
+            path: /tmp/powerline-fonts
+            owner: "{{ username }}"
+            group: "{{ username }}"
+            state: directory
+            mode: '0755'
+        - name: Clone Powerline fonts
+          git:
+            repo: https://github.com/powerline/fonts.git
+            dest: /tmp/powerline-fonts
+          become: no
+        - name: Run install script Powerline fonts
+          shell: /tmp/powerline-fonts/install.sh
+          become: no
+
+    - name: Install NVM (Node Version Manager)
+      block:
+        - name: Download NVM installation script
+          get_url:
+            url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh
+            dest: /tmp/install_nvm.sh
+            mode: '0755'
+          become: no
+
+        - name: Run NVM installation script
+          shell: bash /tmp/install_nvm.sh
+          become: no
+          environment:
+            HOME: "/home/{{ username }}"
+
+    - name: Install latest LTS version of Node.js
+      shell: |
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        nvm install --lts
+      become: no
+      environment:
+        HOME: "/home/{{ username }}"
+
+    - name: Create Starship configuration directory
+      file:
+        path: /home/{{ username }}/.config
+        state: directory
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: '0755'
+
+    - name: Copy custom starship.toml configuration
+      copy:
+        src: files/starship.toml
+        dest: /home/{{ username }}/.config/starship.toml
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: '0644'
+
+    - name: Copy custom .zshrc configuration
+      copy:
+        src: files/.zshrc
+        dest: /home/{{ username }}/.zshrc
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: '0644'
