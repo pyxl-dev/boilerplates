@@ -1,5 +1,5 @@
 ---
-- name: Configure WSL with my favorite tools and configurations
+- name: Configure Ubuntu with my favorite tools and configurations
   hosts: localhost
   become: yes
 
