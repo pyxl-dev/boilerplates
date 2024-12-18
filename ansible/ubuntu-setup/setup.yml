@@ -23,7 +23,7 @@
           - zsh
           - unzip
           - fontconfig
-          - exa
+          - lsd
           - xsel
         state: present
 
