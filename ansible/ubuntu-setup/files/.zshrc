@@ -47,9 +47,9 @@ alias gh='git hist'
 # More aliases
 # -------------------------------------------------------------------
 
-alias ls="exa"
-alias ll="exa -l"
-alias la="exa -la"
+alias ls="lsd"
+alias ll="lsd -l"
+alias la="lsd -la"
 
 # -------------------------------------------------------------------
 # nvm
