@@ -25,11 +25,7 @@
           - fontconfig
           - lsd
           - xsel
-        state: present
-
-    - name: Install Docker
-      apt:
-        name: docker-compose
+          - docker-compose
         state: present
 
     - name: Change default shell to zsh
