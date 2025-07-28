@@ -52,6 +52,15 @@ alias ll="lsd -l"
 alias la="lsd -la"
 
 # -------------------------------------------------------------------
+# Claude
+# -------------------------------------------------------------------
+
+alias cc="claude-trace --run-with --dangerously-skip-permissions"
+alias ccc="claude-trace --run-with --dangerously-skip-permissions -c"
+alias ccu="bunx ccusage"
+alias ccul="bunx ccusage blocks --live"
+
+# -------------------------------------------------------------------
 # nvm
 # -------------------------------------------------------------------
 export NVM_DIR="$HOME/.nvm"
